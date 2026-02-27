@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priyansh Technologies - Smart Calendar</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <img src="public/priyanshlogo.png" alt="Priyansh Technologies Logo" class="sidebar-logo">
+
+
+            <div id="liveClock" class="clock mt-3"></div>
+
+            <hr>
+
+            <div id="miniCalendar"></div>
+
+            <hr>
+            <button class="btn btn-primary w-100 mt-2" id="addEventBtn">
+                <i class="bi bi-plus-circle"></i> Add Event
+            </button>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+
+            <div class="topbar">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-primary btn-sm" id="todayBtn">Today</button>
+                    <button class="nav-arrow-btn" id="prevBtn">◀</button>
+                </div>
+
+                <h4 id="monthYear" class="mb-0 topbar-title"></h4>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="nav-arrow-btn" id="nextBtn">▶</button>
+                    <div class="view-toggle" id="viewToggle">
+                        <button class="view-toggle-btn active" data-view="month" id="monthViewBtn"><i
+                                class="bi bi-grid-3x3-gap-fill me-1"></i>Month</button>
+                        <button class="view-toggle-btn" data-view="week" id="weekViewBtn"><i
+                                class="bi bi-calendar-week me-1"></i>Week</button>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm rounded-circle" id="toggleDark"
+                        title="Toggle Dark Mode"
+                        style="width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center;">🌙</button>
+                </div>
+            </div>
+
+            <div class="calendar-grid" id="calendar"></div>
+
+            <!-- CATEGORY BAR -->
+            <div class="category-bar" id="categoryBar">
+                <div class="category-bar-labels" id="categoryLabels"></div>
+                <div class="category-bar-segments" id="categorySegments"></div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- EVENT MODAL -->
+    <div class="modal fade" id="eventModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content event-modal-content">
+
+                <div class="modal-header event-modal-header">
+                    <h5 class="modal-title" id="modalHeading">
+                        <i class="bi bi-calendar-plus me-2"></i>Add Event
+                    </h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-4">
+
+                    <input type="hidden" id="selectedDate">
+                    <input type="hidden" id="editIndex">
+
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Event Title <span class="text-danger">*</span></label>
+                        <input type="text" id="eventTitle" class="form-control" placeholder="Enter event title...">
+                    </div>
+
+                    <!-- Date & Time row -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
+                            <input type="date" id="eventDate" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Start Time</label>
+                            <input type="time" id="eventStartTime" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Duration</label>
+                            <select id="eventDuration" class="form-select">
+                                <option value="15 min">15 minutes</option>
+                                <option value="30 min">30 minutes</option>
+                                <option value="45 min">45 minutes</option>
+                                <option value="1 hr" selected>1 hour</option>
+                                <option value="1.5 hr">1.5 hours</option>
+                                <option value="2 hr">2 hours</option>
+                                <option value="3 hr">3 hours</option>
+                                <option value="All day">All day</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        <textarea id="eventNotes" class="form-control" rows="2"
+                            placeholder="Add description or notes..."></textarea>
+                    </div>
+
+                    <!-- Color Category -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category</label>
+                        <div class="color-category-group">
+                            <button type="button" class="color-cat-btn" data-color="#e53935" id="catRed">
+                                <span class="cat-dot" style="background:#e53935;"></span> 🚨 Emergency
+                            </button>
+                            <button type="button" class="color-cat-btn" data-color="#1a73e8" id="catHoliday">
+                                <span class="cat-dot" style="background:#1a73e8;"></span> 🌿 Holiday
+                            </button>
+                            <button type="button" class="color-cat-btn" data-color="#f9a825" id="catYellow">
+                                <span class="cat-dot" style="background:#f9a825;"></span> 🔔 Reminder
+                            </button>
+                            <button type="button" class="color-cat-btn active-cat" data-color="#43a047" id="catEvent">
+                                <span class="cat-dot" style="background:#43a047;"></span> 📅 Event
+                            </button>
+                        </div>
+                        <input type="hidden" id="eventColor" value="#43a047">
+                    </div>
+                    <!-- Reminder Section -->
+                    <div class="reminder-box mb-2">
+                        <div class="form-check mb-2">
+                            <input type="checkbox" id="eventReminder" class="form-check-input">
+                            <label class="form-check-label fw-semibold" for="eventReminder">
+                                <i class="bi bi-bell me-1"></i> Enable Reminder
+                            </label>
+                        </div>
+                        <div id="reminderFields" class="row g-2" style="display:none!important;">
+                            <div class="col-md-6">
+                                <label class="form-label small">Reminder Date</label>
+                                <input type="date" id="reminderDate" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small">Reminder Time</label>
+                                <input type="time" id="reminderTime" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /modal-body -->
+
+                <div class="modal-footer event-modal-footer">
+                    <button class="btn btn-outline-danger me-auto" id="deleteEventBtn">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary px-4" id="saveEventBtn">
+                        <i class="bi bi-check-lg"></i> Save Event
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>
