@@ -3,11 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Priyansh Technologies - Smart Calendar</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -17,19 +20,17 @@
     <div class="dashboard">
 
         <!-- SIDEBAR -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="appSidebar">
             <img src="public/priyanshlogo.png" alt="Priyansh Technologies Logo" class="sidebar-logo">
-
-
-            <div id="liveClock" class="clock mt-3"></div>
-
-            <hr>
-
+            <div id="liveClock" class="clock mt-2"></div>
+            <hr class="sidebar-divider">
             <div id="miniCalendar"></div>
-
-            <hr>
-            <button class="btn btn-primary w-100 mt-2" id="addEventBtn">
-                <i class="bi bi-plus-circle"></i> Add Event
+            <hr class="sidebar-divider">
+            <button class="btn btn-primary w-100 mt-1" id="addEventBtn">
+                <i class="bi bi-plus-circle me-1"></i> Add Event
+            </button>
+            <button class="btn btn-outline-light w-100 mt-2" id="weeklyReportBtn">
+                <i class="bi bi-bar-chart-line me-1"></i> Weekly Report
             </button>
         </aside>
 
@@ -37,26 +38,39 @@
         <main class="main-content">
 
             <div class="topbar">
-                <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-outline-primary btn-sm" id="todayBtn">Today</button>
-                    <button class="nav-arrow-btn" id="prevBtn">◀</button>
-                </div>
-
+                <!-- Center: Month/Year title (appears first thanks to order CSS) -->
                 <h4 id="monthYear" class="mb-0 topbar-title"></h4>
 
-                <div class="d-flex align-items-center gap-2">
-                    <button class="nav-arrow-btn" id="nextBtn">▶</button>
-                    <div class="view-toggle" id="viewToggle">
-                        <button class="view-toggle-btn active" data-view="month" id="monthViewBtn"><i
-                                class="bi bi-grid-3x3-gap-fill me-1"></i>Month</button>
-                        <button class="view-toggle-btn" data-view="week" id="weekViewBtn"><i
-                                class="bi bi-calendar-week me-1"></i>Week</button>
+                <!-- Nav row: Left + Right groups always together -->
+                <div class="topbar-nav-row">
+                    <!-- Left: hamburger (mobile) + Today + Prev -->
+                    <div class="topbar-left">
+                        <button class="btn btn-sm sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar"
+                            aria-label="Toggle Sidebar">
+                            <i class="bi bi-list fs-5"></i>
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" id="todayBtn">Today</button>
+                        <button class="nav-arrow-btn" id="prevBtn">◀</button>
                     </div>
-                    <button class="btn btn-outline-secondary btn-sm rounded-circle" id="toggleDark"
-                        title="Toggle Dark Mode"
-                        style="width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center;">🌙</button>
+
+                    <!-- Right: Next + View toggle + Dark mode -->
+                    <div class="topbar-right">
+                        <button class="nav-arrow-btn" id="nextBtn">▶</button>
+                        <div class="view-toggle" id="viewToggle">
+                            <button class="view-toggle-btn active" data-view="month" id="monthViewBtn">
+                                <i class="bi bi-grid-3x3-gap-fill me-1"></i>Month
+                            </button>
+                            <button class="view-toggle-btn" data-view="week" id="weekViewBtn">
+                                <i class="bi bi-calendar-week me-1"></i>Week
+                            </button>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm rounded-circle" id="toggleDark"
+                            title="Toggle Dark Mode"
+                            style="width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;">🌙</button>
+                    </div>
                 </div>
             </div>
+
 
             <div class="calendar-grid" id="calendar"></div>
 
@@ -69,7 +83,6 @@
         </main>
 
     </div>
-
     <!-- EVENT MODAL -->
     <div class="modal fade" id="eventModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -101,7 +114,57 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Start Time</label>
-                            <input type="time" id="eventStartTime" class="form-control">
+                            <select id="eventStartTime" class="form-select">
+                                <option value="">Select time</option>
+                                <option value="00:00">12:00 AM</option>
+                                <option value="00:30">12:30 AM</option>
+                                <option value="01:00">1:00 AM</option>
+                                <option value="01:30">1:30 AM</option>
+                                <option value="02:00">2:00 AM</option>
+                                <option value="02:30">2:30 AM</option>
+                                <option value="03:00">3:00 AM</option>
+                                <option value="03:30">3:30 AM</option>
+                                <option value="04:00">4:00 AM</option>
+                                <option value="04:30">4:30 AM</option>
+                                <option value="05:00">5:00 AM</option>
+                                <option value="05:30">5:30 AM</option>
+                                <option value="06:00">6:00 AM</option>
+                                <option value="06:30">6:30 AM</option>
+                                <option value="07:00">7:00 AM</option>
+                                <option value="07:30">7:30 AM</option>
+                                <option value="08:00">8:00 AM</option>
+                                <option value="08:30">8:30 AM</option>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="09:30">9:30 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="10:30">10:30 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="11:30">11:30 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="12:30">12:30 PM</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="13:30">1:30 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="14:30">2:30 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="15:30">3:30 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                                <option value="16:30">4:30 PM</option>
+                                <option value="17:00">5:00 PM</option>
+                                <option value="17:30">5:30 PM</option>
+                                <option value="18:00">6:00 pm</option>
+                                <option value="18:30">6:30pm</option>
+                                <option value="19:00">7:00pm</option>
+                                <option value="19:30">7:30pm</option>
+                                <option value="20:00">8:00pm</option>
+                                <option value="20:30">8:30pm</option>
+                                <option value="21:00">9:00pm</option>
+                                <option value="21:30">9:30pm</option>
+                                <option value="22:00">10:00pm</option>
+                                <option value="22:30">10:30pm</option>
+                                <option value="23:00">11:00pm</option>
+                                <option value="23:30">11:30pm</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Duration</label>
@@ -144,6 +207,45 @@
                         </div>
                         <input type="hidden" id="eventColor" value="#43a047">
                     </div>
+
+                    <!-- Attendees Section -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold"><i class="bi bi-people me-1"></i> Attendees</label>
+                        <div class="attendees-input-wrap" id="attendeesWrap">
+                            <div class="attendee-tags" id="attendeeTags"></div>
+                            <input type="email" id="attendeeInput" class="attendee-input"
+                                placeholder="Type email & press Enter...">
+                        </div>
+                        <small class="text-muted">Press <kbd>Enter</kbd> or <kbd>,</kbd> to add. Click × to
+                            remove.</small>
+                    </div>
+
+                    <!-- Meeting Link -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold"><i class="bi bi-link-45deg me-1"></i> Meeting Link</label>
+                        <div class="input-group">
+                            <input type="text" id="meetingLink" class="form-control"
+                                placeholder="Auto-generated or paste your own..." readonly>
+                            <button class="btn btn-outline-primary" type="button" id="generateLinkBtn"
+                                title="Generate meeting link">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" type="button" id="copyLinkBtn" title="Copy link">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Send Email Toggle -->
+                    <div class="send-invite-box mb-2">
+                        <div class="form-check">
+                            <input type="checkbox" id="sendEmailToggle" class="form-check-input" checked>
+                            <label class="form-check-label fw-semibold" for="sendEmailToggle">
+                                <i class="bi bi-envelope-paper me-1"></i> Send email invites to attendees
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- Reminder Section -->
                     <div class="reminder-box mb-2">
                         <div class="form-check mb-2">
@@ -180,9 +282,30 @@
         </div>
     </div>
 
+    <!-- WEEKLY REPORT MODAL -->
+    <div class="modal fade" id="weeklyReportModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content weekly-report-content">
+                <div class="modal-header weekly-report-header">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-bar-chart-line fs-4"></i>
+                        <div>
+                            <h5 class="modal-title mb-0" id="weeklyReportTitle">Weekly Report</h5>
+                            <small id="weeklyReportRange" class="opacity-75"></small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span id="weeklyReportTotalBadge" class="badge bg-light text-dark fs-6 px-3 py-2"></span>
+                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                </div>
+                <div class="modal-body p-0" id="weeklyReportBody"></div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="app.js"></script>
-
 </body>
 
 </html>
