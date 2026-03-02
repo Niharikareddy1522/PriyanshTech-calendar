@@ -37,36 +37,33 @@
         <main class="main-content">
 
             <div class="topbar">
-                <!-- Center: Month/Year title (appears first thanks to order CSS) -->
+                <!-- Left: Prev button (always far left) -->
+                <div class="topbar-left-outer">
+                    <button class="nav-arrow-btn" id="prevBtn" aria-label="Previous">◀</button>
+                </div>
+
+                <!-- Center: Month/Year title -->
                 <h4 id="monthYear" class="mb-0 topbar-title"></h4>
 
-                <!-- Nav row: Left + Right groups always together -->
-                <div class="topbar-nav-row">
-                    <!-- Left: hamburger (mobile) + Today + Prev -->
-                    <div class="topbar-left">
-                        <button class="btn btn-sm sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar"
-                            aria-label="Toggle Sidebar">
-                            <i class="bi bi-list fs-5"></i>
+                <!-- Right: hamburger (mobile) + Today + Next + View toggle + Dark mode -->
+                <div class="topbar-right-outer">
+                    <button class="btn btn-sm sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar"
+                        aria-label="Toggle Sidebar">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm" id="todayBtn">Today</button>
+                    <button class="nav-arrow-btn" id="nextBtn" aria-label="Next">▶</button>
+                    <div class="view-toggle" id="viewToggle">
+                        <button class="view-toggle-btn active" data-view="month" id="monthViewBtn">
+                            <i class="bi bi-grid-3x3-gap-fill me-1"></i>Month
                         </button>
-                        <button class="btn btn-outline-primary btn-sm" id="todayBtn">Today</button>
-                        <button class="nav-arrow-btn" id="prevBtn">◀</button>
+                        <button class="view-toggle-btn" data-view="week" id="weekViewBtn">
+                            <i class="bi bi-calendar-week me-1"></i>Week
+                        </button>
                     </div>
-
-                    <!-- Right: Next + View toggle + Dark mode -->
-                    <div class="topbar-right">
-                        <button class="nav-arrow-btn" id="nextBtn">▶</button>
-                        <div class="view-toggle" id="viewToggle">
-                            <button class="view-toggle-btn active" data-view="month" id="monthViewBtn">
-                                <i class="bi bi-grid-3x3-gap-fill me-1"></i>Month
-                            </button>
-                            <button class="view-toggle-btn" data-view="week" id="weekViewBtn">
-                                <i class="bi bi-calendar-week me-1"></i>Week
-                            </button>
-                        </div>
-                        <button class="btn btn-outline-secondary btn-sm rounded-circle" id="toggleDark"
-                            title="Toggle Dark Mode"
-                            style="width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;">🌙</button>
-                    </div>
+                    <button class="btn btn-outline-secondary btn-sm rounded-circle" id="toggleDark"
+                        title="Toggle Dark Mode"
+                        style="width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;">🌙</button>
                 </div>
             </div>
 

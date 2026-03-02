@@ -66,41 +66,39 @@ body {
     flex-direction: column;
 }
 
-/* ─── Topbar ─── */
+/* ─── Topbar — 3-column grid: [◀ prev] [title] [right controls] ─── */
 .topbar {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
     margin-bottom: 15px;
     gap: 10px;
     flex-shrink: 0;
 }
 
+.topbar-left-outer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-start;
+}
+
 .topbar-title {
-    flex: 1;
     text-align: center;
     font-size: 1.3rem;
     font-weight: 700;
     white-space: nowrap;
     margin: 0;
     letter-spacing: -0.01em;
-    /* Pull title to center even with variable-width nav-row */
     min-width: 0;
 }
 
-.topbar-nav-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-.topbar-left,
-.topbar-right {
+.topbar-right-outer {
     display: flex;
     align-items: center;
     gap: 6px;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
 }
 
 .nav-arrow-btn {
@@ -1276,6 +1274,11 @@ body {
         display: none !important;
     }
 
+    .topbar-left-outer,
+    .topbar-right-outer {
+        gap: 8px;
+    }
+
     .week-view-container {
         max-height: calc(100vh - 160px);
     }
@@ -1327,10 +1330,11 @@ body {
         padding: 14px 16px;
     }
 
-    /* Topbar keeps flex, title is centered between the nav-row */
+    /* Topbar: 3-column layout on tablet */
     .topbar {
         margin-bottom: 12px;
         gap: 8px;
+        grid-template-columns: auto 1fr auto;
     }
 
     .topbar-title {
@@ -1440,30 +1444,34 @@ body {
     }
 
     /* ── Topbar mobile:
-       Row 1: [March 2026]   ← full width, centered
-       Row 2: [☰ Today ◀] ─── [▶ Month Week 🌙]
+       Row 1: [◀]  [March 2026]  [☰ Today ▶ Month Week 🌙]  ← 3-col grid
+       On very small screens, collapses to:
+       Row 1: [March 2026]   — centered full width
+       Row 2: [◀]  ──  [☰ Today ▶ Month Week 🌙]
     ── */
     .topbar {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
         gap: 6px;
         margin-bottom: 10px;
-        align-items: stretch;
+        align-items: center;
     }
 
     .topbar-title {
-        order: 0;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         font-weight: 700;
         text-align: center;
         margin: 0;
-        width: 100%;
     }
 
-    .topbar-nav-row {
-        order: 1;
-        width: 100%;
-        justify-content: space-between;
-        gap: 6px;
+    .topbar-left-outer {
+        justify-content: flex-start;
+    }
+
+    .topbar-right-outer {
+        justify-content: flex-end;
+        gap: 5px;
+        flex-wrap: nowrap;
     }
 
     /* ── Calendar grid ── */
@@ -1563,6 +1571,11 @@ body {
     .view-toggle-btn {
         padding: 5px 9px;
         font-size: 12px;
+    }
+
+    /* Hide icons inside view toggle on mobile to save space */
+    .view-toggle-btn i {
+        display: none;
     }
 
     /* ── Week view ── */
@@ -1682,6 +1695,22 @@ body {
 
     .view-toggle-btn i {
         display: none;
+    }
+
+    /* Compact right-outer on tiny screens */
+    .topbar-right-outer {
+        gap: 4px;
+    }
+
+    .nav-arrow-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+
+    #todayBtn {
+        padding: 3px 7px;
+        font-size: 11px;
     }
 }
 
