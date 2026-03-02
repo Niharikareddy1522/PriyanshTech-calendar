@@ -13,6 +13,34 @@ body {
 .dashboard {
     display: flex;
     height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ── Mobile Sidebar Overlay Backdrop ── */
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 199;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    animation: fadeIn 0.22s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.sidebar-backdrop.active {
+    display: block;
 }
 
 .sidebar {
@@ -1284,53 +1312,89 @@ body {
     }
 }
 
-/* ── Tablet (601px – 899px) ── */
+/* ══════════════════════════════════════
+   MOBILE SIDEBAR — SLIDE-IN DRAWER
+   (applies to tablet ≤899px AND mobile ≤600px)
+══════════════════════════════════════ */
 @media (max-width: 899px) {
+
+    /* Dashboard: main fills entire screen */
     .dashboard {
-        flex-direction: column;
-        height: auto;
-        min-height: 100vh;
+        flex-direction: row;
+        height: 100dvh;
+        overflow: hidden;
     }
 
+    /* Sidebar: fixed overlay drawer, hidden off-screen by default */
     .sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        padding: 12px 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100dvh;
+        width: 280px;
+        max-width: 85vw;
+        z-index: 200;
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 20px 16px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Collapsed = fully hidden (default on mobile) */
+    .sidebar.sidebar-collapsed {
+        transform: translateX(-100%);
+    }
+
+    /* Expanded = slide in */
+    .sidebar.sidebar-expanded {
+        transform: translateX(0);
     }
 
     .dark-mode .sidebar {
-        border-bottom: 1px solid #333;
+        border-right: 1px solid #333;
+    }
+
+    /* Main content fills entire screen width */
+    .main-content {
+        flex: 1;
+        width: 100%;
+        padding: 12px 14px;
+        overflow-y: auto;
+        height: 100dvh;
     }
 
     .sidebar-logo {
-        max-width: 150px;
+        max-width: 160px;
     }
 
     .sidebar #addEventBtn,
     .sidebar #weeklyReportBtn {
-        max-width: 320px;
         width: 100%;
+        max-width: 100%;
     }
 
     #miniCalendar {
         width: 100%;
-        max-width: 300px;
+        max-width: 240px;
     }
 
     #liveClock {
         text-align: center;
+        font-size: 13px;
     }
 
-    .main-content {
-        padding: 14px 16px;
+    /* Show hamburger toggle button on tablet/mobile */
+    .sidebar-toggle-btn {
+        display: inline-flex !important;
     }
 
-    /* Topbar: 3-column layout on tablet */
+    /* Topbar: 3-column layout */
     .topbar {
         margin-bottom: 12px;
         gap: 8px;
@@ -1341,6 +1405,7 @@ body {
         font-size: 1.15rem;
     }
 
+    /* Calendar grid */
     .calendar-grid {
         gap: 5px;
     }
@@ -1372,7 +1437,7 @@ body {
 
     /* Week view */
     .week-view-container {
-        max-height: calc(100vh - 200px);
+        max-height: calc(100dvh - 140px);
         min-height: 400px;
     }
 
@@ -1393,35 +1458,22 @@ body {
     }
 }
 
-/* ── Mobile (≤600px) ── */
+/* ── Mobile (≤600px) — additional overrides on top of tablet rules ── */
 @media (max-width: 600px) {
     body {
         font-size: 14px;
     }
 
-    .dashboard {
-        flex-direction: column;
-        height: auto;
-        min-height: 100vh;
-    }
-
+    /* Sidebar drawer is narrower on small phones */
     .sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        padding: 10px 14px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        width: 260px;
+        max-width: 80vw;
+        padding: 16px 14px;
         gap: 8px;
     }
 
-    .dark-mode .sidebar {
-        border-bottom: 1px solid #333;
-    }
-
     .sidebar-logo {
-        max-width: 120px;
+        max-width: 130px;
     }
 
     .clock {
@@ -1429,18 +1481,11 @@ body {
     }
 
     #miniCalendar {
-        width: 100%;
-        max-width: 260px;
-    }
-
-    .sidebar #addEventBtn,
-    .sidebar #weeklyReportBtn {
-        width: 100%;
-        max-width: 260px;
+        max-width: 220px;
     }
 
     .main-content {
-        padding: 10px 10px;
+        padding: 8px 10px;
     }
 
     /* ── Topbar mobile:
@@ -1716,29 +1761,19 @@ body {
 
 /* ── Landscape phones ── */
 @media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+
+    /* Sidebar remains a fixed drawer; just adjust its internal content */
     .sidebar {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        justify-content: space-between;
-        padding: 8px 16px;
-        gap: 8px;
+        padding: 10px 14px;
+        gap: 6px;
     }
 
     .sidebar-logo {
-        max-width: 80px;
-    }
-
-    #miniCalendar {
-        max-width: 180px;
-    }
-
-    .clock {
-        font-size: 11px;
+        max-width: 90px;
     }
 
     .sidebar hr {
-        display: none;
+        margin: 4px 0;
     }
 
     .sidebar #addEventBtn,
@@ -1748,7 +1783,7 @@ body {
     }
 
     .main-content {
-        padding: 8px 12px;
+        padding: 6px 10px;
     }
 
     .calendar-day {
@@ -2071,6 +2106,241 @@ body {
 .dark-mode .wr-event-count {
     background: #1a3a6e;
     color: #8ab4f8;
+}
+
+/* ══════════════════════════════════════
+   WEEKLY REPORT — MOBILE RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 600px) {
+
+    /* Full-screen modal on mobile */
+    #weeklyReportModal .modal-dialog {
+        margin: 0;
+        max-width: 100%;
+        height: 100dvh;
+    }
+
+    #weeklyReportModal .modal-content {
+        height: 100dvh;
+        border-radius: 0;
+    }
+
+    /* Compact header */
+    .weekly-report-header {
+        padding: 14px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .weekly-report-header h5 {
+        font-size: 15px;
+    }
+
+    #weeklyReportTotalBadge {
+        font-size: 13px !important;
+        padding: 4px 10px !important;
+    }
+
+    /* Day section */
+    .wr-day-header {
+        padding: 12px 14px 8px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .wr-day-label {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .wr-day-name {
+        font-size: 14px;
+        min-width: unset;
+    }
+
+    .wr-day-date {
+        font-size: 12px;
+        padding: 2px 8px;
+    }
+
+    .wr-event-count,
+    .wr-no-events {
+        font-size: 11px;
+    }
+
+    .wr-add-btn {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+
+    /* Hide the desktop flex table header */
+    .wr-table-header {
+        display: none !important;
+    }
+
+    /* Make table margin tighter */
+    .wr-table {
+        margin: 0 10px 12px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* ── Convert each row to a vertical card ── */
+    .wr-table-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "title   title"
+            "time    duration"
+            "cat     reminder";
+        padding: 12px 14px;
+        gap: 6px 10px;
+        align-items: start;
+        border-bottom: 1px solid #f1f3f4;
+        border-left-width: 4px !important;
+    }
+
+    /* Assign grid areas to columns */
+    .wr-col-title {
+        grid-area: title;
+        align-items: flex-start;
+        flex-direction: row;
+    }
+
+    .wr-col-time {
+        grid-area: time;
+    }
+
+    .wr-col-duration {
+        grid-area: duration;
+        text-align: right;
+    }
+
+    .wr-col-cat {
+        grid-area: cat;
+    }
+
+    .wr-col-reminder {
+        grid-area: reminder;
+        text-align: right;
+    }
+
+    /* Add small labels before each value */
+    .wr-col-time::before {
+        content: "⏰ ";
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    .wr-col-duration::before {
+        content: "⏱ ";
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    .wr-col-time,
+    .wr-col-duration {
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .wr-col-cat {
+        font-size: 11.5px;
+    }
+
+    .wr-col-reminder {
+        font-size: 11.5px;
+    }
+
+    /* Event title */
+    .wr-ev-name {
+        font-size: 13px;
+        font-weight: 700;
+        white-space: normal;
+    }
+
+    .wr-ev-notes {
+        font-size: 11px;
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    /* Category chip smaller */
+    .wr-cat-chip {
+        font-size: 10.5px;
+        padding: 2px 7px;
+    }
+
+    /* Reminder pill smaller */
+    .wr-reminder-pill {
+        font-size: 10.5px;
+        padding: 2px 6px;
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+
+    .wr-no-reminder {
+        font-size: 12px;
+    }
+
+    /* Empty day */
+    .wr-empty-day {
+        padding: 8px 14px 12px;
+        font-size: 12.5px;
+    }
+}
+
+/* Tablet (601–899px): slightly tighten columns */
+@media (min-width: 601px) and (max-width: 899px) {
+
+    .weekly-report-header {
+        padding: 16px 20px;
+    }
+
+    .wr-table {
+        margin: 0 14px 12px;
+    }
+
+    .wr-table-header,
+    .wr-table-row {
+        padding: 8px 10px;
+    }
+
+    .wr-col-title {
+        flex: 2;
+    }
+
+    .wr-col-time {
+        flex: 1;
+        font-size: 12px;
+    }
+
+    .wr-col-duration {
+        flex: 0.8;
+        font-size: 12px;
+    }
+
+    .wr-col-cat {
+        flex: 1.2;
+    }
+
+    /* Hide reminder on tablet to save space */
+    .wr-col-reminder {
+        display: none;
+    }
+
+    .wr-ev-name {
+        font-size: 12.5px;
+    }
+
+    .wr-cat-chip {
+        font-size: 10.5px;
+        padding: 2px 7px;
+    }
+
+    .wr-table-header .wr-col-reminder {
+        display: none;
+    }
 }
 
 /* ══════════════════════════════════════

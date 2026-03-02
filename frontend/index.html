@@ -37,20 +37,20 @@
         <main class="main-content">
 
             <div class="topbar">
-                <!-- Left: Prev button (always far left) -->
+                <!-- Left: hamburger menu + Prev button -->
                 <div class="topbar-left-outer">
+                    <button class="btn btn-sm sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar"
+                        aria-label="Toggle Sidebar">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
                     <button class="nav-arrow-btn" id="prevBtn" aria-label="Previous">◀</button>
                 </div>
 
                 <!-- Center: Month/Year title -->
                 <h4 id="monthYear" class="mb-0 topbar-title"></h4>
 
-                <!-- Right: hamburger (mobile) + Today + Next + View toggle + Dark mode -->
+                <!-- Right: Today + Next + View toggle + Dark mode -->
                 <div class="topbar-right-outer">
-                    <button class="btn btn-sm sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar"
-                        aria-label="Toggle Sidebar">
-                        <i class="bi bi-list fs-5"></i>
-                    </button>
                     <button class="btn btn-outline-primary btn-sm" id="todayBtn">Today</button>
                     <button class="nav-arrow-btn" id="nextBtn" aria-label="Next">▶</button>
                     <div class="view-toggle" id="viewToggle">

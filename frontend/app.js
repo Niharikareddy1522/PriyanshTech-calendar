@@ -1258,30 +1258,54 @@ renderCurrentView();
     const toggleBtn = document.getElementById('sidebarToggleBtn');
     if (!sidebar || !toggleBtn) return;
 
-    // On mobile: sidebar starts collapsed for a cleaner initial view
+    // Create the backdrop overlay element
+    const backdrop = document.createElement('div');
+    backdrop.className = 'sidebar-backdrop';
+    document.body.appendChild(backdrop);
+
     function isMobile() {
         return window.innerWidth <= 899;
     }
 
-    // Set initial state
+    function openSidebar() {
+        sidebar.classList.remove('sidebar-collapsed');
+        sidebar.classList.add('sidebar-expanded');
+        backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden'; // prevent scroll behind drawer
+    }
+
+    function closeSidebar() {
+        sidebar.classList.add('sidebar-collapsed');
+        sidebar.classList.remove('sidebar-expanded');
+        backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Set initial state: collapsed on mobile
     if (isMobile()) {
         sidebar.classList.add('sidebar-collapsed');
     }
 
+    // Toggle on hamburger click
     toggleBtn.addEventListener('click', () => {
-        if (sidebar.classList.contains('sidebar-collapsed')) {
-            sidebar.classList.remove('sidebar-collapsed');
-            sidebar.classList.add('sidebar-expanded');
+        if (sidebar.classList.contains('sidebar-expanded')) {
+            closeSidebar();
         } else {
-            sidebar.classList.add('sidebar-collapsed');
-            sidebar.classList.remove('sidebar-expanded');
+            openSidebar();
         }
     });
 
-    // On resize: remove collapsed classes on desktop
+    // Close when backdrop is tapped
+    backdrop.addEventListener('click', closeSidebar);
+
+    // On resize: restore desktop layout
     window.addEventListener('resize', () => {
         if (!isMobile()) {
             sidebar.classList.remove('sidebar-collapsed', 'sidebar-expanded');
+            backdrop.classList.remove('active');
+            document.body.style.overflow = '';
+        } else if (!sidebar.classList.contains('sidebar-expanded')) {
+            sidebar.classList.add('sidebar-collapsed');
         }
     });
 })();
