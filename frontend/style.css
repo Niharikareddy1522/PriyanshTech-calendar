@@ -808,49 +808,53 @@ body {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
-    padding: 10px 14px;
+    padding: 10px 12px;
 }
 
-/* Each category block: label row + color bar underneath */
+/* Each category block: label + count on top, color bar at bottom */
 .cat-block {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0;
     border-radius: 8px;
-    padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.18);
+    overflow: hidden;
     transition: background 0.18s, transform 0.15s;
+    min-width: 0;
 }
 
 .cat-block.cat-clickable {
     cursor: default;
 }
 
-.cat-block.cat-clickable[onclick],
 .cat-block[onclick] {
     cursor: pointer;
 }
 
 .cat-block:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.26);
     transform: translateY(-1px);
 }
 
+/* Top section: emoji label left, count badge right */
 .cat-block-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
+    gap: 4px;
+    padding: 8px 10px 7px;
 }
 
+/* Colored bar — full width, flush to bottom of block */
 .cat-block-bar {
-    height: 5px;
-    border-radius: 4px;
+    height: 4px;
     width: 100%;
+    border-radius: 0;
+    flex-shrink: 0;
     transition: opacity 0.3s;
 }
 
-/* Keep old class names working in case referenced elsewhere */
+/* Keep old class names working */
 .cat-bar-label {
     display: flex;
     align-items: center;
@@ -877,6 +881,7 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .cat-bar-count {
@@ -894,7 +899,7 @@ body {
 
 .category-bar-segments {
     display: none;
-    /* hidden — color bars now live inside each .cat-block */
+    /* hidden — bars live inside each .cat-block */
 }
 
 .cat-bar-segment {
@@ -1505,12 +1510,17 @@ body {
         padding: 8px 10px;
     }
 
-    .cat-block {
-        padding: 7px 8px;
+    .cat-block-top {
+        padding: 7px 8px 6px;
     }
 
     .cat-bar-text {
         font-size: 11px;
+    }
+
+    .cat-bar-count {
+        font-size: 10px;
+        padding: 1px 6px;
     }
 
     /* Week view */
@@ -1659,19 +1669,16 @@ body {
         border-radius: 10px;
     }
 
+    /* 2 columns on mobile — each block is a self-contained card */
     .category-bar-labels {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 6px;
-        padding: 8px 10px;
-    }
-
-    .cat-block {
-        padding: 8px 10px;
-        border-radius: 8px;
+        padding: 8px 8px;
     }
 
     .cat-block-top {
+        padding: 8px 10px 7px;
         justify-content: space-between;
     }
 
@@ -1859,12 +1866,11 @@ body {
     .category-bar-labels {
         grid-template-columns: 1fr 1fr;
         gap: 4px;
-        padding: 6px 8px;
+        padding: 5px 6px;
     }
 
-    .cat-block {
-        padding: 6px 8px;
-        border-radius: 7px;
+    .cat-block-top {
+        padding: 6px 8px 5px;
     }
 
     .cat-bar-text {
