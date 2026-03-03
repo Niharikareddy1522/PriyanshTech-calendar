@@ -1,7 +1,6 @@
 /* ─── Firebase Firestore Real-Time Sync ─── */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ── REPLACE these values with your own Firebase project config ──
 // Go to https://console.firebase.google.com → Your project → Project Settings → Your apps
