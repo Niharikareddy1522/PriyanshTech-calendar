@@ -803,14 +803,54 @@ body {
     flex-shrink: 0;
 }
 
+/* ── Category Bar: unified grid of blocks ── */
 .category-bar-labels {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 10px 14px;
+}
+
+/* Each category block: label row + color bar underneath */
+.cat-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.08);
+    transition: background 0.18s, transform 0.15s;
+}
+
+.cat-block.cat-clickable {
+    cursor: default;
+}
+
+.cat-block.cat-clickable[onclick],
+.cat-block[onclick] {
+    cursor: pointer;
+}
+
+.cat-block:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.cat-block-top {
+    display: flex;
     align-items: center;
-    padding: 10px 16px 6px;
+    justify-content: space-between;
     gap: 6px;
 }
 
+.cat-block-bar {
+    height: 5px;
+    border-radius: 4px;
+    width: 100%;
+    transition: opacity 0.3s;
+}
+
+/* Keep old class names working in case referenced elsewhere */
 .cat-bar-label {
     display: flex;
     align-items: center;
@@ -831,8 +871,12 @@ body {
 }
 
 .cat-bar-text {
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 500;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .cat-bar-count {
@@ -841,19 +885,16 @@ body {
     color: #32668c;
     background: white;
     border-radius: 10px;
-    padding: 2px 8px;
-    min-width: 22px;
+    padding: 1px 7px;
+    min-width: 20px;
     text-align: center;
-    line-height: 1.4;
+    line-height: 1.5;
+    flex-shrink: 0;
 }
 
 .category-bar-segments {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    height: 6px;
-    gap: 4px;
-    padding: 0 16px 10px;
-    box-sizing: content-box;
+    display: none;
+    /* hidden — color bars now live inside each .cat-block */
 }
 
 .cat-bar-segment {
@@ -1457,24 +1498,19 @@ body {
         padding: 5px;
     }
 
-    /* Category bar: keep 4-column on tablet */
+    /* Category bar: 4-column block grid on tablet */
     .category-bar-labels {
         grid-template-columns: repeat(4, 1fr);
-        padding: 10px 12px 6px;
-        gap: 4px;
+        gap: 6px;
+        padding: 8px 10px;
     }
 
-    .cat-bar-label {
-        font-size: 11.5px;
+    .cat-block {
+        padding: 7px 8px;
     }
 
     .cat-bar-text {
-        font-size: 11.5px;
-    }
-
-    .category-bar-segments {
-        padding: 0 12px 8px;
-        gap: 3px;
+        font-size: 11px;
     }
 
     /* Week view */
@@ -1617,7 +1653,7 @@ body {
         font-size: 8px;
     }
 
-    /* ── Category bar: 2×2 grid on mobile, always at the bottom ── */
+    /* ── Category bar: 2×2 block grid on mobile, pinned to bottom ── */
     .category-bar {
         margin-top: auto;
         border-radius: 10px;
@@ -1626,45 +1662,27 @@ body {
     .category-bar-labels {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 6px 8px;
-        padding: 10px 14px 6px;
-        justify-items: start;
+        gap: 6px;
+        padding: 8px 10px;
     }
 
-    .cat-bar-label {
-        justify-content: flex-start;
-        font-size: 11.5px;
-        gap: 5px;
-        width: 100%;
-        white-space: nowrap;
-        overflow: hidden;
+    .cat-block {
+        padding: 8px 10px;
+        border-radius: 8px;
+    }
+
+    .cat-block-top {
+        justify-content: space-between;
     }
 
     .cat-bar-text {
         font-size: 11.5px;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
 
     .cat-bar-count {
         font-size: 10.5px;
         padding: 1px 7px;
         min-width: 18px;
-        flex-shrink: 0;
-    }
-
-    /* Segments bar: 2 per row to match 2×2 label grid */
-    .category-bar-segments {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        height: auto;
-        gap: 6px 8px;
-        padding: 0 14px 10px;
-    }
-
-    .cat-bar-segment {
-        height: 6px;
-        border-radius: 4px;
     }
 
     /* ── Nav buttons ── */
@@ -1840,17 +1858,13 @@ body {
 
     .category-bar-labels {
         grid-template-columns: 1fr 1fr;
-        gap: 4px 6px;
-        padding: 8px 10px 4px;
+        gap: 4px;
+        padding: 6px 8px;
     }
 
-    .category-bar-segments {
-        padding: 0 10px 8px;
-        gap: 4px 6px;
-    }
-
-    .cat-bar-label {
-        font-size: 10px;
+    .cat-block {
+        padding: 6px 8px;
+        border-radius: 7px;
     }
 
     .cat-bar-text {

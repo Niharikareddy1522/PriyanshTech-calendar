@@ -1054,37 +1054,32 @@ function renderCategoryBar() {
         }
     }
 
-    // Labels (clickable)
+    // Unified category blocks — label + color bar in one element
     const labelsEl = document.getElementById('categoryLabels');
     labelsEl.innerHTML = '';
+    // Hide the old segments container (no longer needed)
+    const segmentsEl = document.getElementById('categorySegments');
+    segmentsEl.innerHTML = '';
+    segmentsEl.style.display = 'none';
+
     Object.keys(categoryInfo).forEach(c => {
         const info = categoryInfo[c];
         const count = counts[c];
-        const label = document.createElement('div');
-        label.className = 'cat-bar-label cat-clickable';
-        label.title = `Click to highlight ${info.label} events`;
-        label.innerHTML = `<span class="cat-bar-text">${info.label}</span><span class="cat-bar-count">${count}</span>`;
-        if (count > 0) label.onclick = () => highlightCategory(c);
-        labelsEl.appendChild(label);
-    });
 
-    const segmentsEl = document.getElementById('categorySegments');
-    segmentsEl.innerHTML = '';
+        const block = document.createElement('div');
+        block.className = 'cat-block cat-clickable';
+        block.title = `Click to highlight ${info.label} events`;
 
-    Object.keys(categoryInfo).forEach(c => {
-        const seg = document.createElement('div');
-        seg.className = 'cat-bar-segment';
-        seg.title = `Click to highlight ${categoryInfo[c].label} events`;
+        block.innerHTML = `
+            <div class="cat-block-top">
+                <span class="cat-bar-text">${info.label}</span>
+                <span class="cat-bar-count">${count}</span>
+            </div>
+            <div class="cat-block-bar" style="background:${info.color};opacity:${count > 0 ? '1' : '0.18'}"></div>
+        `;
 
-        seg.style.background = categoryInfo[c].color;
-        if (counts[c] > 0) {
-            seg.style.opacity = '1';
-            seg.style.cursor = 'pointer';
-            seg.onclick = () => highlightCategory(c);
-        } else {
-            seg.style.opacity = '0.12';
-        }
-        segmentsEl.appendChild(seg);
+        if (count > 0) block.onclick = () => highlightCategory(c);
+        labelsEl.appendChild(block);
     });
 }
 
