@@ -5,12 +5,13 @@ import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/f
 // ── REPLACE these values with your own Firebase project config ──
 // Go to https://console.firebase.google.com → Your project → Project Settings → Your apps
 const firebaseConfig = {
-    apiKey: "AIzaSyD_REPLACE_WITH_YOUR_API_KEY",
-    authDomain: "REPLACE_WITH_YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
-    storageBucket: "REPLACE_WITH_YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "REPLACE_WITH_YOUR_SENDER_ID",
-    appId: "REPLACE_WITH_YOUR_APP_ID"
+    apiKey: "AIzaSyDmsUmU9mh64sPgoHLQBqONfVtalv_BFtQ",
+    authDomain: "priyanshtech-calendar-47470.firebaseapp.com",
+    projectId: "priyanshtech-calendar-47470",
+    storageBucket: "priyanshtech-calendar-47470.firebasestorage.app",
+    messagingSenderId: "544366531653",
+    appId: "1:544366531653:web:5929ed739aef301c0c7f2c",
+    measurementId: "G-SW78QREYQ7"
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
