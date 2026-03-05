@@ -135,11 +135,26 @@ function startFirestoreListener() {
 /* ─── Live Clock ─── */
 function updateClock() {
     const now = new Date();
-    document.getElementById("liveClock").innerHTML =
-        now.toDateString() + "<br>" + now.toLocaleTimeString();
+    const dateStr = now.toLocaleDateString(undefined, {
+        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+    });
+    const timeStr = now.toLocaleTimeString(undefined, {
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    document.getElementById("liveClock").innerHTML = dateStr + "<br>" + timeStr;
 }
 setInterval(updateClock, 1000);
 updateClock();
+
+/* ─── Device Timezone Label ─── */
+function getDeviceTzLabel() {
+    const now = new Date();
+    const offsetMins = -now.getTimezoneOffset();
+    const sign = offsetMins >= 0 ? '+' : '-';
+    const absH = String(Math.floor(Math.abs(offsetMins) / 60)).padStart(2, '0');
+    const absM = String(Math.abs(offsetMins) % 60).padStart(2, '0');
+    return `GMT${sign}${absH}:${absM}`;
+}
 
 /* ─── Duration Helper ─── */
 function getDurationMins(duration) {
@@ -194,9 +209,9 @@ function renderCalendar() {
     const lastDate = new Date(year, month + 1, 0).getDate();
 
     // Weekday headers
-    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(d => {
+    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach((d, idx) => {
         let h = document.createElement("div");
-        h.className = "calendar-weekday";
+        h.className = "calendar-weekday" + (idx === 0 || idx === 6 ? " weekend-header" : "");
         h.innerText = d;
         calendar.appendChild(h);
     });
@@ -214,8 +229,12 @@ function renderCalendar() {
         let dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
         const past = isPastDate(dateKey);
 
+        // Determine day of week for this date
+        const dayOfWeek = new Date(year, month, day).getDay(); // 0=Sun, 6=Sat
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
         let div = document.createElement("div");
-        div.className = "calendar-day" + (past ? " past-day" : "");
+        div.className = "calendar-day" + (past ? " past-day" : "") + (isWeekend ? " weekend" : "");
         div.dataset.date = dateKey;
 
         if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
@@ -299,7 +318,7 @@ function renderMiniCalendar() {
                 </div>
             </div>
             <div class="mini-cal-grid">
-                ${days.map(d => `<div class="mini-day-name">${d}</div>`).join("")}
+                ${days.map((d, idx) => `<div class="mini-day-name${idx === 0 || idx === 6 ? ' mini-weekend-name' : ''}">${d}</div>`).join("")}
     `;
 
     for (let i = 0; i < firstDay; i++)
@@ -307,7 +326,9 @@ function renderMiniCalendar() {
 
     for (let day = 1; day <= lastDate; day++) {
         const isToday = day === today.getDate() && m === today.getMonth() && y === today.getFullYear();
-        html += `<div class="mini-day${isToday ? " mini-today" : ""}">${day}</div>`;
+        const dow = new Date(y, m, day).getDay(); // 0=Sun, 6=Sat
+        const isWknd = dow === 0 || dow === 6;
+        html += `<div class="mini-day${isToday ? ' mini-today' : ''}${isWknd ? ' mini-weekend' : ''}">${day}</div>`;
     }
 
     const totalCells = firstDay + lastDate;
@@ -351,7 +372,7 @@ function renderDayView(dateObj) {
 
     const tzLabel = document.createElement("div");
     tzLabel.className = "day-view-tz";
-    tzLabel.innerText = "GMT+05:30";
+    tzLabel.innerText = getDeviceTzLabel();
 
     const colHeader = document.createElement("div");
     colHeader.className = "day-view-col-header";
@@ -475,7 +496,7 @@ function renderWeekView() {
 
     const tzCorner = document.createElement("div");
     tzCorner.className = "week-tz-corner";
-    tzCorner.textContent = "GMT+05:30";
+    tzCorner.textContent = getDeviceTzLabel();
     header.appendChild(tzCorner);
 
     const weekDays = [];
@@ -489,6 +510,8 @@ function renderWeekView() {
 
         const isToday = d.getTime() === today.getTime();
         const dayAbbr = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+        const isWeekendCol = d.getDay() === 0 || d.getDay() === 6;
+        if (isWeekendCol) colH.classList.add("wk-weekend-header");
 
         colH.innerHTML = `
             <span class="week-day-name ${isToday ? 'wk-today-text' : ''}">${dayAbbr}</span>
@@ -561,7 +584,8 @@ function renderWeekView() {
         const isToday = d.getTime() === today.getTime();
 
         const col = document.createElement("div");
-        col.className = `week-day-col ${isToday ? 'wk-today-col' : ''}`;
+        const isWeekendDay = d.getDay() === 0 || d.getDay() === 6;
+        col.className = `week-day-col ${isToday ? 'wk-today-col' : ''} ${isWeekendDay ? 'wk-weekend-col' : ''}`;
 
         // Background hour slots (for click targets + grid lines)
         for (let h = 0; h < 24; h++) {
@@ -699,6 +723,7 @@ function setupReminderToggle() {
 /* ─── Attendee Management ─── */
 function renderAttendeeTags() {
     const tagsEl = document.getElementById("attendeeTags");
+    if (!tagsEl) return;
     tagsEl.innerHTML = "";
     currentAttendees.forEach((email, i) => {
         const tag = document.createElement("span");
@@ -737,6 +762,7 @@ function addAttendee(email) {
 function setupAttendeeInput() {
     const input = document.getElementById("attendeeInput");
     const wrap = document.getElementById("attendeesWrap");
+    if (!input || !wrap) return; // attendee section removed from HTML — skip
 
     // Focus input when clicking the wrapper
     wrap.onclick = () => input.focus();
@@ -766,16 +792,21 @@ function generateMeetingLink() {
 }
 
 function setupMeetingLink() {
-    document.getElementById("generateLinkBtn").onclick = () => {
-        document.getElementById("meetingLink").value = generateMeetingLink();
-    };
-    document.getElementById("copyLinkBtn").onclick = () => {
-        const link = document.getElementById("meetingLink").value;
-        if (!link) return;
-        navigator.clipboard.writeText(link).then(() => {
-            showEmailToast("📋 Meeting link copied!", "success");
-        });
-    };
+    const genBtn = document.getElementById("generateLinkBtn");
+    const copyBtn = document.getElementById("copyLinkBtn");
+    const linkInput = document.getElementById("meetingLink");
+    if (genBtn && linkInput) {
+        genBtn.onclick = () => { linkInput.value = generateMeetingLink(); };
+    }
+    if (copyBtn && linkInput) {
+        copyBtn.onclick = () => {
+            const link = linkInput.value;
+            if (!link) return;
+            navigator.clipboard.writeText(link).then(() => {
+                showEmailToast("📋 Meeting link copied!", "success");
+            });
+        };
+    }
 }
 setupMeetingLink();
 
@@ -859,7 +890,7 @@ function setModalReadOnly(isReadOnly) {
     ];
     fieldsToDisable.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.disabled = isReadOnly;
+        if (el) el.disabled = isReadOnly; // safe: element may not exist if removed from HTML
     });
     // Disable category buttons
     document.querySelectorAll(".color-cat-btn").forEach(btn => {
@@ -917,8 +948,10 @@ function openModal(dateKey, index) {
         document.getElementById("reminderTime").value = ev.reminderTime || "";
         // Attendees & Meeting Link
         currentAttendees = ev.attendees ? [...ev.attendees] : [];
-        document.getElementById("meetingLink").value = ev.meetingLink || "";
-        document.getElementById("sendEmailToggle").checked = false; // Don't re-send by default on edit
+        const mlEdit = document.getElementById("meetingLink");
+        if (mlEdit) mlEdit.value = ev.meetingLink || "";
+        const sendToggleEdit = document.getElementById("sendEmailToggle");
+        if (sendToggleEdit) sendToggleEdit.checked = false;
         setupColorButtons(ev.color || "#43a047");
     } else {
         heading.innerHTML = '<i class="bi bi-calendar-plus me-2"></i>Add Event';
@@ -934,15 +967,18 @@ function openModal(dateKey, index) {
         document.getElementById("reminderTime").value = "";
         // Attendees & Meeting Link
         currentAttendees = [];
-        document.getElementById("meetingLink").value = generateMeetingLink();
-        document.getElementById("sendEmailToggle").checked = true;
+        const mlNew = document.getElementById("meetingLink");
+        if (mlNew) mlNew.value = generateMeetingLink();
+        const sendToggleNew = document.getElementById("sendEmailToggle");
+        if (sendToggleNew) sendToggleNew.checked = true;
         setupColorButtons("#43a047");
     }
 
     // Render attendee tags & setup input
     renderAttendeeTags();
     setupAttendeeInput();
-    document.getElementById("attendeeInput").value = "";
+    const attendeeInputEl = document.getElementById("attendeeInput");
+    if (attendeeInputEl) attendeeInputEl.value = "";
 
     // Apply read-only mode for past dates (view existing events only)
     setModalReadOnly(past);
@@ -969,7 +1005,7 @@ document.getElementById("saveEventBtn").onclick = function () {
         reminderDate: document.getElementById("reminderDate").value,
         reminderTime: document.getElementById("reminderTime").value,
         attendees: [...currentAttendees],
-        meetingLink: document.getElementById("meetingLink").value,
+        meetingLink: document.getElementById("meetingLink")?.value || "",
     };
 
     if (!events[dateVal]) events[dateVal] = [];
@@ -995,7 +1031,8 @@ document.getElementById("saveEventBtn").onclick = function () {
     }
 
     // Send email invites if toggle is ON and there are attendees
-    const shouldSendEmail = document.getElementById("sendEmailToggle").checked;
+    const sendToggle = document.getElementById("sendEmailToggle");
+    const shouldSendEmail = sendToggle ? sendToggle.checked : false;
     if (shouldSendEmail && ev.attendees.length > 0) {
         sendEventEmails(ev, ev.attendees);
     }
