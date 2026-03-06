@@ -1438,42 +1438,139 @@ body {
     right: 4px;
     color: white;
     border-radius: 8px;
-    padding: 6px 10px;
+    padding: 5px 8px;
     font-size: 12px;
-    overflow: visible;
+    overflow: hidden;
+    /* clip content to the block */
     cursor: pointer;
     pointer-events: auto;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-    border-left: 3px solid rgba(255, 255, 255, 0.35);
-    transition: box-shadow 0.15s, transform 0.1s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+    border-left: 4px solid rgba(255, 255, 255, 0.4);
+    transition: box-shadow 0.15s, transform 0.1s, filter 0.15s;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
     justify-content: flex-start;
     align-items: stretch;
-    min-height: auto;
+    box-sizing: border-box;
 }
 
 .week-event-block:hover {
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-    transform: scale(1.02);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    transform: scale(1.018);
     z-index: 10;
+    filter: brightness(1.06);
 }
 
+/* ── Title (always shown) ── */
 .week-ev-title {
-    font-weight: 600;
-    font-size: 11px;
+    font-weight: 700;
+    font-size: 11.5px;
     line-height: 1.3;
     width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
     display: block;
+    flex-shrink: 0;
 }
 
+/* ── Time (short form, used in < 1hr blocks) ── */
 .week-ev-time {
-    font-size: 11px;
-    opacity: 0.9;
+    font-size: 10.5px;
+    opacity: 0.88;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
+
+/* ── Time range (start – end, used in >= 1hr blocks) ── */
+.week-ev-timerange {
+    font-size: 10.5px;
+    opacity: 0.92;
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+}
+
+/* ── Duration label (shown in >= 2hr blocks) ── */
+.week-ev-duration {
+    font-size: 10px;
+    opacity: 0.75;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: auto;
+    /* push to bottom of block */
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
+    white-space: nowrap;
+}
+
+/* ── Size variants: tune padding & font for each height class ── */
+
+/* Small: < 1 hour (e.g. 15min, 30min, 45min) */
+.week-event-block.wk-ev-sm {
+    padding: 3px 6px;
+    gap: 1px;
+    border-radius: 5px;
+}
+
+.week-event-block.wk-ev-sm .week-ev-title {
+    font-size: 10.5px;
+    line-height: 1.2;
+}
+
+/* Medium: 1 hour */
+.week-event-block.wk-ev-md {
+    padding: 6px 9px;
+}
+
+/* Large: 2 hours */
+.week-event-block.wk-ev-lg {
+    padding: 8px 10px;
+    gap: 4px;
+    border-radius: 10px;
+}
+
+.week-event-block.wk-ev-lg .week-ev-title {
+    font-size: 13px;
+    white-space: normal;
+    /* allow wrapping in tall blocks */
+    overflow: visible;
+    text-overflow: unset;
+}
+
+/* XL: 3-4 hours */
+.week-event-block.wk-ev-xl {
+    padding: 10px 12px;
+    gap: 5px;
+    border-radius: 12px;
+    border-left-width: 5px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+}
+
+.week-event-block.wk-ev-xl .week-ev-title {
+    font-size: 14px;
+    font-weight: 800;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.4;
+}
+
+.week-event-block.wk-ev-xl .week-ev-timerange {
+    font-size: 12px;
+    opacity: 1;
+    font-weight: 600;
+}
+
+.week-event-block.wk-ev-xl .week-ev-duration {
+    font-size: 11px;
+    opacity: 0.85;
+}
+
+
 
 
 /* Current time indicator */

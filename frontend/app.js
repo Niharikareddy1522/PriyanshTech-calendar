@@ -167,7 +167,11 @@ function getDeviceTzLabel() {
 
 /* ─── Duration Helper ─── */
 function getDurationMins(duration) {
-    const map = { "15 min": 15, "30 min": 30, "45 min": 45, "1 hr": 60, "1.5 hr": 90, "2 hr": 120, "3 hr": 180, "All day": 1440 };
+    const map = {
+        "15 min": 15, "25 min": 25, "30 min": 30, "45 min": 45,
+        "1 hr": 60, "1.5 hr": 90, "2 hr": 120, "2.5hr": 150,
+        "3 hr": 180, "4 hr": 240, "All day": 1440
+    };
     return map[duration] || 60;
 }
 
@@ -720,23 +724,45 @@ function renderWeekView() {
 
                 let [hours, minutes] = ev.startTime.split(':').map(Number);
                 let durationMins = getDurationMins(ev.duration);
-                const minuteHeight = 60 / 60; // 60px per hour / 60 minutes
+                const PX_PER_MIN = 1; // 60px per hour ÷ 60 min = 1px per minute
 
-                const topPx = (hours * 60 + minutes) * minuteHeight;
-                const heightPx = durationMins * minuteHeight;
+                const topPx = (hours * 60 + minutes) * PX_PER_MIN;
+                const heightPx = Math.max(durationMins * PX_PER_MIN, 22);
 
                 // Is this event in the past?
                 const evTotalMin = hours * 60 + minutes;
                 const evIsPast = isPastDay || (isToday && evTotalMin + durationMins <= nowTotalMin);
 
+                // Build end-time string for display inside tall blocks
+                const endTotalMin = evTotalMin + durationMins;
+                const endH = Math.floor(endTotalMin / 60) % 24;
+                const endM = endTotalMin % 60;
+                const endTimeStr = formatShortTime(`${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`);
+                const startTimeStr = formatShortTime(ev.startTime);
+
                 const eDiv = document.createElement("div");
                 eDiv.className = "week-event-block" + (evIsPast ? " wk-past-event" : "");
+                // Add size class so CSS can style differently for large blocks
+                if (durationMins >= 240) eDiv.classList.add('wk-ev-xl');
+                else if (durationMins >= 120) eDiv.classList.add('wk-ev-lg');
+                else if (durationMins >= 60) eDiv.classList.add('wk-ev-md');
+                else eDiv.classList.add('wk-ev-sm');
+
                 eDiv.style.background = ev.color || "#43a047";
                 eDiv.dataset.color = ev.color || '#43a047';
                 eDiv.style.top = `${topPx}px`;
-                eDiv.style.height = `${Math.max(heightPx, 18)}px`;
-                const timeStr = ev.startTime;
-                eDiv.innerHTML = `<span class="week-ev-title">${ev.title}</span><span class="week-ev-time">${timeStr}</span>`;
+                eDiv.style.height = `${heightPx}px`;
+
+                // Richer content for tall events
+                if (durationMins >= 60) {
+                    eDiv.innerHTML = `
+                        <span class="week-ev-title">${ev.title}</span>
+                        <span class="week-ev-timerange">${startTimeStr} – ${endTimeStr}</span>
+                        ${durationMins >= 120 ? `<span class="week-ev-duration">${ev.duration}</span>` : ''}
+                    `;
+                } else {
+                    eDiv.innerHTML = `<span class="week-ev-title">${ev.title}</span><span class="week-ev-time">${startTimeStr}</span>`;
+                }
                 eDiv.onclick = (e) => { e.stopPropagation(); openModal(dateKey, index); };
                 evLayer.appendChild(eDiv);
             });
