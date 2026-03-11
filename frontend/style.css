@@ -1893,6 +1893,8 @@ body {
         max-width: 82vw;
         padding: 16px 14px;
         gap: 8px;
+        display: flex;
+        flex-direction: column;
     }
 
     .sidebar-logo {
@@ -2254,7 +2256,13 @@ body {
     .sidebar #addEventBtn,
     .sidebar #weeklyReportBtn {
         font-size: 12px;
-        padding: 6px 10px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        text-align: center;
     }
 
     .main-content {

@@ -5,19 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Priyansh Technologies - Smart Calendar</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <div class="dashboard">
-
         <!-- SIDEBAR -->
         <aside class="sidebar sidebar-collapsed" id="appSidebar">
             <img src="public/priyanshlogo.png" alt="Priyansh Technologies Logo" class="sidebar-logo">
@@ -32,10 +28,8 @@
                 <i class="bi bi-bar-chart-line me-1"></i> Weekly Report
             </button>
         </aside>
-
         <!-- MAIN -->
         <main class="main-content">
-
             <div class="topbar">
                 <!-- Left: hamburger menu + Prev button -->
                 <div class="topbar-left-outer">
@@ -45,10 +39,8 @@
                     </button>
                     <button class="nav-arrow-btn" id="prevBtn" aria-label="Previous">◀</button>
                 </div>
-
                 <!-- Center: Month/Year title -->
                 <h4 id="monthYear" class="mb-0 topbar-title"></h4>
-
                 <!-- Right: Today + Next + View toggle + Dark mode -->
                 <div class="topbar-right-outer">
                     <button class="btn btn-outline-primary btn-sm" id="todayBtn">Today</button>
@@ -66,42 +58,32 @@
                         style="width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;">🌙</button>
                 </div>
             </div>
-
-
             <div class="calendar-grid" id="calendar"></div>
-
             <!-- CATEGORY BAR -->
             <div class="category-bar" id="categoryBar">
                 <div class="category-bar-labels" id="categoryLabels"></div>
                 <div class="category-bar-segments" id="categorySegments"></div>
             </div>
-
         </main>
-
     </div>
     <!-- EVENT MODAL -->
     <div class="modal fade" id="eventModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content event-modal-content">
-
                 <div class="modal-header event-modal-header">
                     <h5 class="modal-title" id="modalHeading">
                         <i class="bi bi-calendar-plus me-2"></i>Add Event
                     </h5>
                     <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body p-4">
-
                     <input type="hidden" id="selectedDate">
                     <input type="hidden" id="editIndex">
-
                     <!-- Title -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Event Title <span class="text-danger">*</span></label>
                         <input type="text" id="eventTitle" class="form-control" placeholder="Enter event title...">
                     </div>
-
                     <!-- Date & Time row -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
@@ -112,7 +94,7 @@
                             <label class="form-label fw-semibold">Start Time</label>
                             <div class="time-picker-group" id="startTimePicker">
                                 <select id="startHour" class="form-select time-picker-select" title="Hour">
-
+                                    <option value="--">--</option>
                                     <option value="12">12</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -131,7 +113,6 @@
                                     <option value="00">00</option>
                                     <option value="10">10</option>
                                     <option value="15">15</option>
-
                                     <option value="30">30</option>
                                     <option value="45">45</option>
                                 </select>
@@ -189,8 +170,6 @@
                         </div>
                         <input type="hidden" id="eventColor" value="#43a047">
                     </div>
-
-
                     <!-- Reminder Section -->
                     <div class="reminder-box mb-2">
                         <div class="form-check mb-2">

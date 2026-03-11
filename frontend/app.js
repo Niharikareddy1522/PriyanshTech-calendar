@@ -1,7 +1,6 @@
 /* ─── Firebase Firestore Real-Time Sync ─── */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 // ── REPLACE these values with your own Firebase project config ──
 // Go to https://console.firebase.google.com → Your project → Project Settings → Your apps
 const firebaseConfig = {
@@ -13,23 +12,19 @@ const firebaseConfig = {
     appId: "1:544366531653:web:5929ed739aef301c0c7f2c",
     measurementId: "G-SW78QREYQ7"
 };
-
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 const EVENTS_DOC = doc(db, "calendar", "shared-events");
-
 let currentDate = new Date();
 let events = {}; // Populated from Firestore; kept in sync via onSnapshot
 let dragged = null;
 let currentView = "month"; // "month" or "week"
 let currentAttendees = []; // attendee emails for current modal session
-
 /* ─── EmailJS Initialization ─── */
 // IMPORTANT: Replace these with YOUR EmailJS credentials
 const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";     // From EmailJS dashboard > Account
 const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";     // From EmailJS dashboard > Email Services
 const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";   // From EmailJS dashboard > Email Templates
-
 (function initEmailJS() {
     try {
         emailjs.init(EMAILJS_PUBLIC_KEY);
@@ -38,7 +33,6 @@ const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";   // From EmailJS dashboard > Em
         console.warn("⚠️ EmailJS not loaded yet, emails won't send.", e);
     }
 })();
-
 /* ─── Past Date Helper ─── */
 // Returns true only if the WHOLE DATE is strictly before today (day level)
 function isPastDate(dateKey) {
@@ -47,7 +41,6 @@ function isPastDate(dateKey) {
     const d = new Date(dateKey + "T00:00:00");
     return d < today;
 }
-
 // Returns true if the given date+time is more than 1 minute in the past
 function isPastDateTime(dateKey, time24) {
     if (!time24) return isPastDate(dateKey); // all-day: only check date
@@ -84,12 +77,10 @@ function showSyncStatus(status) {
         setTimeout(() => { el.style.opacity = '0'; }, 3000);
     }
 }
-
 /* ─── Firestore Save ─── */
 // _isSaving prevents the onSnapshot callback (triggered by our own write)
 // from overwriting the local events object before the write promise resolves.
 let _isSaving = false;
-
 async function saveStorage() {
     _isSaving = true;
     showSyncStatus('saving');
@@ -105,7 +96,6 @@ async function saveStorage() {
         _isSaving = false;
     }
 }
-
 /* ─── Real-Time Listener ─── */
 // Registered after the DOM is ready so renderCurrentView is guaranteed to exist.
 // onSnapshot fires instantly when any device writes new data.
@@ -140,7 +130,6 @@ function startFirestoreListener() {
         renderCurrentView();
     });
 }
-
 /* ─── Live Clock ─── */
 function updateClock() {
     const now = new Date();
@@ -154,7 +143,6 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 updateClock();
-
 /* ─── Device Timezone Label ─── */
 function getDeviceTzLabel() {
     const now = new Date();
@@ -164,7 +152,6 @@ function getDeviceTzLabel() {
     const absM = String(Math.abs(offsetMins) % 60).padStart(2, '0');
     return `GMT${sign}${absH}:${absM}`;
 }
-
 /* ─── Duration Helper ─── */
 function getDurationMins(duration) {
     const map = {
@@ -174,7 +161,6 @@ function getDurationMins(duration) {
     };
     return map[duration] || 60;
 }
-
 /* ─── Short Time Format (e.g. "9a", "2:30p") ─── */
 function formatShortTime(timeStr) {
     if (!timeStr) return '';
@@ -183,7 +169,6 @@ function formatShortTime(timeStr) {
     const hour12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
     return m === 0 ? `${hour12}${suffix}` : `${hour12}:${String(m).padStart(2, '0')}${suffix}`;
 }
-
 /* ─── Snap time to nearest 15-min slot ─── */
 function snapToSlot(timeStr) {
     if (!timeStr) return '';
@@ -192,7 +177,6 @@ function snapToSlot(timeStr) {
     const snappedH = m >= 53 ? (h + 1) % 24 : h;
     return `${String(snappedH).padStart(2, '0')}:${String(snappedM).padStart(2, '0')}`;
 }
-
 /* ─── Time Picker Helpers (3-column Hour/Min/AM-PM <-> 24h string) ─── */
 function setStartTimePicker(timeStr24) {
     // timeStr24 like "09:30" or "" for all-day
@@ -210,7 +194,6 @@ function setStartTimePicker(timeStr24) {
     m.value = String(snappedM).padStart(2, '0');
     syncStartTimeHidden();
 }
-
 function getStartTime24h() {
     const h = parseInt(document.getElementById('startHour')?.value || '0', 10);
     const m = parseInt(document.getElementById('startMinute')?.value || '0', 10);
@@ -219,12 +202,10 @@ function getStartTime24h() {
     let hour24 = h === 12 ? (ap === 'AM' ? 0 : 12) : (ap === 'PM' ? h + 12 : h);
     return `${String(hour24).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
-
 function syncStartTimeHidden() {
     const hidden = document.getElementById('eventStartTime');
     if (hidden) hidden.value = getStartTime24h();
 }
-
 function setReminderTimePicker(timeStr24) {
     const h = document.getElementById('reminderHour');
     const m = document.getElementById('reminderMinute');
@@ -239,7 +220,6 @@ function setReminderTimePicker(timeStr24) {
     m.value = String(snappedM).padStart(2, '0');
     syncReminderTimeHidden();
 }
-
 function getReminderTime24h() {
     const h = parseInt(document.getElementById('reminderHour')?.value || '0', 10);
     const m = parseInt(document.getElementById('reminderMinute')?.value || '0', 10);
@@ -248,7 +228,6 @@ function getReminderTime24h() {
     let hour24 = h === 12 ? (ap === 'AM' ? 0 : 12) : (ap === 'PM' ? h + 12 : h);
     return `${String(hour24).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
-
 function syncReminderTimeHidden() {
     const hidden = document.getElementById('reminderTime');
     if (hidden) hidden.value = getReminderTime24h();
@@ -304,7 +283,6 @@ function renderCalendar() {
     const calendar = document.getElementById("calendar");
     calendar.innerHTML = "";
     calendar.className = "calendar-grid";
-
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     document.getElementById("monthYear").innerText =
@@ -399,7 +377,6 @@ function renderCalendar() {
 
 /* ─── Mini Calendar ─── */
 let miniDate = new Date();
-
 function renderMiniCalendar() {
     const container = document.getElementById("miniCalendar");
     const today = new Date();
@@ -483,12 +460,10 @@ function renderDayView(dateObj) {
     const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
     const today = new Date();
     const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-
     colHeader.innerHTML = `
         <span class="day-view-name ${isToday ? 'today-text' : ''}">${dayName}</span>
         <div class="day-view-number ${isToday ? 'today-circle' : ''}">${day}</div>
     `;
-
     headerRow.appendChild(tzLabel);
     headerRow.appendChild(colHeader);
     dayViewContainer.appendChild(headerRow);
@@ -517,22 +492,18 @@ function renderDayView(dateObj) {
             // Set time AFTER openModal so it doesn't get cleared
             document.getElementById("eventStartTime").value = snapToSlot(`${String(i - 1).padStart(2, '0')}:00`);
         };
-
         hourRow.appendChild(timeLabel);
         hourRow.appendChild(hourSlot);
         gridBody.appendChild(hourRow);
     }
-
     const eventColumn = document.createElement("div");
     eventColumn.className = "day-events-layer";
-
     if (events[dateKey]) {
         events[dateKey].forEach((ev, index) => {
             if (!ev.startTime) return;
             let [hours, minutes] = ev.startTime.split(':').map(Number);
             let durationMins = getDurationMins(ev.duration);
             const topOffset = (hours * 60) + minutes;
-
             const eDiv = document.createElement("div");
             eDiv.className = "day-event";
             eDiv.style.background = ev.color || "#43a047";
@@ -543,15 +514,12 @@ function renderDayView(dateObj) {
             eventColumn.appendChild(eDiv);
         });
     }
-
     gridBody.appendChild(eventColumn);
     dayViewContainer.appendChild(gridBody);
     calendar.appendChild(dayViewContainer);
-
     document.getElementById("prevBtn").onclick = () => { dateObj.setDate(dateObj.getDate() - 1); renderDayView(dateObj); };
     document.getElementById("nextBtn").onclick = () => { dateObj.setDate(dateObj.getDate() + 1); renderDayView(dateObj); };
 }
-
 /* ─── Week View (Google Calendar Style) ─── */
 function getWeekStart(date) {
     const d = new Date(date);
@@ -560,23 +528,19 @@ function getWeekStart(date) {
     d.setHours(0, 0, 0, 0);
     return d;
 }
-
 function renderWeekView() {
     const calendar = document.getElementById("calendar");
     calendar.innerHTML = "";
     calendar.className = "";
     calendar.style.display = "block";
-
     const weekStart = getWeekStart(currentDate);
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
-
     // Header title
     const startMonth = weekStart.toLocaleString("default", { month: "long" });
     const endMonth = weekEnd.toLocaleString("default", { month: "long" });
     const startYear = weekStart.getFullYear();
     const endYear = weekEnd.getFullYear();
-
     let headerText;
     if (startMonth === endMonth && startYear === endYear) {
         headerText = `${startMonth} ${weekStart.getDate()}–${weekEnd.getDate()}, ${startYear}`;
@@ -586,31 +550,24 @@ function renderWeekView() {
         headerText = `${startMonth} ${weekStart.getDate()}, ${startYear} – ${endMonth} ${weekEnd.getDate()}, ${endYear}`;
     }
     document.getElementById("monthYear").innerText = headerText;
-
     const container = document.createElement("div");
     container.className = "week-view-container";
-
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     // ── Sticky Header ──
     const header = document.createElement("div");
     header.className = "week-header";
-
     const tzCorner = document.createElement("div");
     tzCorner.className = "week-tz-corner";
     tzCorner.textContent = getDeviceTzLabel();
     header.appendChild(tzCorner);
-
     const weekDays = [];
     for (let i = 0; i < 7; i++) {
         const d = new Date(weekStart);
         d.setDate(d.getDate() + i);
         weekDays.push(d);
-
         const colH = document.createElement("div");
         colH.className = "week-col-header";
-
         const isToday = d.getTime() === today.getTime();
         const dayAbbr = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
         const isWeekendCol = d.getDay() === 0 || d.getDay() === 6;
@@ -623,7 +580,6 @@ function renderWeekView() {
         header.appendChild(colH);
     }
     container.appendChild(header);
-
     // ── All-Day row ──
     const allDayRow = document.createElement("div");
     allDayRow.className = "week-allday-row";
@@ -1230,28 +1186,28 @@ document.getElementById("deleteEventBtn").onclick = function () {
 function clearAllPastEventsFromStorage() {
     let removedCount = 0;
     const datesToDelete = [];
-    
+
     for (const dateKey in events) {
         events[dateKey] = events[dateKey].filter(ev => {
             const isPast = isPastDate(dateKey) || isPastDateTime(dateKey, ev.startTime || null);
             if (isPast) removedCount++;
             return !isPast;
         });
-        
+
         if (events[dateKey].length === 0) {
             datesToDelete.push(dateKey);
         }
     }
-    
+
     datesToDelete.forEach(dateKey => delete events[dateKey]);
-    
+
     if (removedCount > 0) {
         saveStorage();
         console.log(`✅ Removed ${removedCount} past event${removedCount !== 1 ? 's' : ''} from storage`);
     } else {
         console.log('ℹ️ No past events to remove');
     }
-    
+
     return removedCount;
 }
 
@@ -1563,7 +1519,6 @@ function renderWeeklyReport(weekOffsetOverride) {
                 setStartTimePicker(snapToSlot(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`));
             }, 300);
         };
-
         dayHeader.appendChild(dayLabel);
         dayHeader.appendChild(addBtn);
         section.appendChild(dayHeader);
